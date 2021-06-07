@@ -4,19 +4,18 @@
 
 struct Datos
 {
-	char nombre[15], apellido[15], numero[15];
+	char nombre[15], apellido[20], numero[15];
 };
 
 char mostrarmenu();
 void agregarcontactos(Datos[], int *);
-void mostrarcontactos(/*Datos[],*/ int);
-void guardarlista(Datos[], int);
+void mostrarcontactos(Datos[], int);
 
 
 int main() {
 	Datos pipol[10];
 	char opc;
-	int contador=0;
+	int pos=0;
 
 	do
 	{
@@ -24,14 +23,13 @@ int main() {
 	switch (opc)
 	{
 	case 'a':
-		agregarcontactos(pipol,&contador);
-		guardarlista(pipol, contador);
+		agregarcontactos(pipol,&pos);
 		break;
 	case 'f':
-		mostrarcontactos(/*pipol,*/ contador);
+		mostrarcontactos(pipol, pos);
 		break;
 	case 'g':
-		guardarlista(pipol, contador);
+		//guardarlista(pipol, pos);
 		break;
 	default:
 		if (opc!='h')
@@ -44,7 +42,7 @@ int main() {
 	}
 	} while (opc!='h');
 
-	system("pause");
+	//system("pause");
 
 }
 
@@ -71,6 +69,7 @@ void agregarcontactos(Datos pipol[], int*cont)
 	printf("\n\n\tCuantos contactos desea ingresar?");
 	scanf_s("%i", &b);
 	system("cls");
+	FILE* lista = fopen("Agenda funcional.h", "ab");
 	for (int i = 0; i < b; i++)
 	{
 		printf("\n\nNombre:\t\t");
@@ -79,56 +78,41 @@ void agregarcontactos(Datos pipol[], int*cont)
 		scanf_s(" %[^\n]s", &pipol[a].apellido, 25);
 		printf("\n\nNumero:\t\t");
 		scanf_s(" %[^\n]s", &pipol[a].numero, 15);
+		fwrite(&pipol[a], 1, sizeof(Datos), lista);
 		a++;
 	}
-	*cont = a;
+	*cont = a+1;
 	system("cls");
+	fclose(lista);
 }
 
 
-void mostrarcontactos(/*Datos pipol[],*/ int cont) {
-	Datos pipol[10];
+void mostrarcontactos(Datos pipol[], int cont) {
+	//Datos pipol[10];
 
 	printf("\n\n\t\tContactos guardados\n\n");
 	int tamanio;
 	FILE* lista;
 
-		lista = fopen("C:\\Users\\pacol\\source\\repos\\agenda con arreglo struct y archivo fprintf\\agenda con arreglo struct y archivo fprintf\\Agenda telefonica binaria.h", "rb");
+		lista = fopen("Agenda funcional.h", "rb");
 
-	fseek(lista, SEEK_END, 1);// lo manda al fin de archivo
+	fseek(lista,0,SEEK_END);// lo manda al fin de archivo
 	tamanio = ftell(lista);
-	tamanio = tamanio / sizeof(lista);
+	tamanio = tamanio / sizeof(Datos);
 	rewind(lista);// no siempre funciona
 
-	printf("%-15s %-15s %-15s\n","Nombre","Apellido","Telefono");
-	for (int i = 0; i < cont; i++)
+	printf("%-30s %-30s %-30s\n","Nombre","Apellido","Telefono");
+	for (int i = 0; i <tamanio; i++)
 	{
-	fread(&pipol[i], 1 , sizeof(pipol),lista);
-	printf("%-20s",pipol[i].nombre);
-	printf("%-20s", pipol[i].apellido);
-	printf("%-20s", pipol[i].numero);
+	fread(&pipol[i],1,sizeof(Datos) ,lista);
+	printf("%-30s",pipol[i].nombre);
+	printf("%-30s", pipol[i].apellido);
+	printf("%-30s", pipol[i].numero);
 	printf("\n");
 	}
 	printf("\n\n\n");
 	system("pause");
 	system("cls");
-}
-
-void guardarlista(Datos pipol[], int cont) {
-	FILE* lista;
-	lista = fopen("C:\\Users\\pacol\\source\\repos\\agenda con arreglo struct y archivo fprintf\\agenda con arreglo struct y archivo fprintf\\Agenda telefonica binaria.h","wb");
-	//fprintf(lista,"\t\tContactos guardados");
-
-	for (int i = 0; i < cont; i++)
-	{
-		fwrite(&pipol[i].nombre,sizeof(pipol),i,lista);
-		fwrite(&pipol[i].apellido, sizeof(pipol), i, lista);
-		fwrite(&pipol[i].numero, sizeof(pipol), i, lista);
-
-	}
-
 	fclose(lista);
-	//printf("\n\n\n");
-	//system("pause");
-	//system("cls");
 }
+
