@@ -2,22 +2,27 @@
 #include <windows.h>
 #pragma warning(disable : 4996)
 #pragma warning(disable : 6054)
+//#pragma warning(disable : 0028)
+
 
 
 struct Datos
 {
 	char nombre[15], apellido[20], numero[15];
+	int status;
 };
 
 char mostrarmenu();
-void agregarcontactos(Datos[], int *);
-void mostrarcontactos(Datos[], int);
+void agregarcontactos(int *);
+void mostrarcontactos_desbloqueados();
 void modificarcontacto();
 void creararchlimpio();
+void bloquearcontacto();
+void mostrarcontactos_bloqueados();
+void desbloquearcontacto();
 
 
 int main() {
-	Datos pipol[10];
 	char opc;
 	int pos=0;
 
@@ -27,23 +32,33 @@ int main() {
 	switch (opc)
 	{
 	case 'a':
-		agregarcontactos(pipol,&pos);
+		agregarcontactos(&pos);
 		system("pause");
 		system("cls");
 		break;
 	case 'f':
-		mostrarcontactos(pipol, pos);
+		mostrarcontactos_desbloqueados();
 		system("pause");
 		system("cls");
 		break;
 	case 'b':
 		system("cls");
-		mostrarcontactos(pipol, pos);
+		mostrarcontactos_desbloqueados();
 		modificarcontacto();
 		break;
 	case 'z':
 		creararchlimpio();
 		break;
+	case 'd':
+		system("cls");
+		mostrarcontactos_desbloqueados();
+		bloquearcontacto();
+		break;
+	case 'g':
+			system("cls");
+			mostrarcontactos_bloqueados();
+			desbloquearcontacto();
+			break;
 	default:
 		if (opc!='h')
 		{
@@ -55,8 +70,49 @@ int main() {
 	}
 	} while (opc!='h');
 
-	//system("pause");
 
+}
+
+void bloquearcontacto() {
+	FILE* lista = fopen("Agenda funcional.h", "r+b");
+	Datos personas;
+
+	int encontrado = 0;
+
+	printf("\n\n\t\t\tIngrese el nombre del contacto que desea bloquear:\n");
+	char nom_mod[20];
+	printf("\n\t\t");
+	scanf_s(" %[^\n]s", &nom_mod, sizeof(nom_mod));
+	fread(&personas, sizeof(Datos), 1, lista);
+	while (!feof(lista))
+	{
+		if (!strcmp(nom_mod, personas.nombre)&&personas.status==1) {
+			printf("%-30s %-30s %-30s\n", "Nombre", "Apellido", "Telefono");
+			printf("%-30s", personas.nombre);
+			printf("%-30s", personas.apellido);
+			printf("%-30s", personas.numero);
+
+			int posicion = ftell(lista) - sizeof(personas);
+			fseek(lista, posicion, SEEK_SET);
+
+			personas.status = 0;
+			fwrite(&personas, sizeof(Datos), 1, lista);
+
+			encontrado++;
+			break;
+		}
+		fread(&personas, sizeof(Datos), 1, lista);
+	}
+	if (encontrado == 0) {
+		printf("\n\n\n\n\t\t\tContacto no encontrado");
+	}
+	else
+	{
+	printf("\n\n\n\n\t\t\tContacto bloqueado con exito.....\n\n\n");
+	}
+	fclose(lista);
+			system("pause");
+			system("cls");
 }
 
 void creararchlimpio() {
@@ -65,22 +121,21 @@ void creararchlimpio() {
 }
 
 void modificarcontacto() {
-	//system("cls");
 
 	FILE* lista = fopen("Agenda funcional.h","r+b");
 	Datos personas;
 
-
+	int encontrado=0;
 
 	printf("\n\n\t\t\tIngrese el nombre del contacto a modificar:\n");
 	char nom_mod[15]; 
 	printf("\n\t\t");
 	scanf_s(" %[^\n]s", &nom_mod, sizeof(nom_mod));
 	system("cls");
-
+	fread(&personas, sizeof(Datos), 1, lista);
 	while (!feof(lista))
-	{
-		if (!strcmp(nom_mod, personas.nombre)) {
+	{	
+		if (!strcmp(nom_mod, personas.nombre) && personas.status==1) {
 			printf("%-30s %-30s %-30s\n", "Nombre", "Apellido", "Telefono");
 			printf("%-30s", personas.nombre);
 			printf("%-30s", personas.apellido);
@@ -119,10 +174,14 @@ void modificarcontacto() {
 				fwrite(&personas, sizeof(Datos), 1, lista);
 				printf("\n\nInformacion guardada.......");
 			}
-
+			encontrado++;
 			break;
 		}
 		fread(&personas, sizeof(Datos),1,lista);
+	}
+
+	if (encontrado == 0) {
+		printf("\n\n\n\n\t\t\tContacto no encontrado");
 	}
 
 	fclose(lista);
@@ -148,11 +207,12 @@ char mostrarmenu() {
 	return a;
 }
 
-void agregarcontactos(Datos pipol[], int*cont)
+void agregarcontactos(int*cont)
 {
 	int a = *cont, b;
 	printf("\n\n\tCuantos contactos desea ingresar?");
 	scanf_s("%i", &b);
+	Datos pipol[10];
 	system("cls");
 	FILE* lista = fopen("Agenda funcional.h", "ab");
 	for (int i = 0; i < b; i++)
@@ -163,20 +223,20 @@ void agregarcontactos(Datos pipol[], int*cont)
 		scanf_s(" %[^\n]s", &pipol[a].apellido, 25);
 		printf("\n\nNumero:\t\t");
 		scanf_s(" %[^\n]s", &pipol[a].numero, 15);
+		pipol[a].status = 1;
 		fwrite(&pipol[a], 1, sizeof(Datos), lista);
 		a++;
 	}
 	*cont = a+1;
-	//system("cls");
 	fclose(lista);
+	printf("\n\n\n\n");
 }
 
-
-void mostrarcontactos(Datos pipol[], int cont) {
-	//Datos pipol[10];
+void mostrarcontactos_desbloqueados() {
 
 	printf("\n\n\t\tContactos guardados\n\n");
 	int tamanio;
+	Datos pipol[20];
 	FILE* lista;
 
 		lista = fopen("Agenda funcional.h", "rb");
@@ -190,12 +250,84 @@ void mostrarcontactos(Datos pipol[], int cont) {
 	for (int i = 0; i <tamanio; i++)
 	{
 	fread(&pipol[i],1,sizeof(Datos) ,lista);
+	if (pipol[i].status==1) {
 	printf("%-30s",pipol[i].nombre);
 	printf("%-30s", pipol[i].apellido);
 	printf("%-30s", pipol[i].numero);
 	printf("\n");
 	}
+	}
 	printf("\n\n\n");
 	fclose(lista);
 }
 
+void mostrarcontactos_bloqueados() {
+
+	printf("\n\n\t\tContactos guardados\n\n");
+	int tamanio;
+	Datos pipol[20];
+	FILE* lista;
+
+	lista = fopen("Agenda funcional.h", "rb");
+
+	fseek(lista, 0, SEEK_END);// lo manda al fin de archivo
+	tamanio = ftell(lista);
+	tamanio = tamanio / sizeof(Datos);
+	rewind(lista);// no siempre funciona
+
+	printf("%-30s %-30s %-30s\n", "Nombre", "Apellido", "Telefono");
+	for (int i = 0; i < tamanio; i++)
+	{
+		fread(&pipol[i], 1, sizeof(Datos), lista);
+		if (pipol[i].status != 1) {
+			printf("%-30s", pipol[i].nombre);
+			printf("%-30s", pipol[i].apellido);
+			printf("%-30s", pipol[i].numero);
+			printf("\n");
+		}
+	}
+	printf("\n\n\n");
+	fclose(lista);
+}
+
+void desbloquearcontacto() {
+	FILE* lista = fopen("Agenda funcional.h", "r+b");
+	Datos personas;
+
+	int encontrado = 0;
+
+	printf("\n\n\t\t\tIngrese el nombre del contacto que desea bloquear:\n");
+	char nom_mod[20];
+	printf("\n\t\t");
+	scanf_s(" %[^\n]s", &nom_mod, sizeof(nom_mod));
+	fread(&personas, sizeof(Datos), 1, lista);
+	while (!feof(lista))
+	{
+		if (!strcmp(nom_mod, personas.nombre) && personas.status != 1) {
+			printf("%-30s %-30s %-30s\n", "Nombre", "Apellido", "Telefono");
+			printf("%-30s", personas.nombre);
+			printf("%-30s", personas.apellido);
+			printf("%-30s", personas.numero);
+
+			int posicion = ftell(lista) - sizeof(personas);
+			fseek(lista, posicion, SEEK_SET);
+
+			personas.status = 1;
+			fwrite(&personas, sizeof(Datos), 1, lista);
+
+			encontrado++;
+			break;
+		}
+		fread(&personas, sizeof(Datos), 1, lista);
+	}
+	if (encontrado == 0) {
+		printf("\n\n\n\n\t\t\tContacto no encontrado");
+	}
+	else
+	{
+	printf("\n\n\n\n\t\t\tContacto desbloqueado con exito.....\n\n\n");
+	}
+	fclose(lista);
+	system("pause");
+	system("cls");
+}
