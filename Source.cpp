@@ -150,7 +150,7 @@ void mostrarcontactos_desbloqueados() {
 
 void mostrarcontactos_bloqueados() {
 
-	printf("\n\n\t\tContactos guardados\n\n");
+	printf("\n\n\t\tContactos bloqueados\n\n");
 	int tamanio;
 	Datos pipol[20];
 	FILE* lista;
@@ -226,7 +226,7 @@ void desbloquearcontacto() {
 
 	int encontrado = 0;
 
-	printf("\n\n\t\t\tIngrese el nombre del contacto que desea bloquear:\n");
+	printf("\n\n\t\t\tIngrese el nombre del contacto que desea desbloquear:\n");
 	char nom_mod[20];
 	printf("\n\t\t");
 	scanf_s(" %[^\n]s", &nom_mod, sizeof(nom_mod));
@@ -290,7 +290,7 @@ void modificarcontacto() {
 			printf("\n\nQue dato desea modificar?");
 			printf("\n\t\t1)\tNombre");
 			printf("\n\t\t2)\tApellido");
-			printf("\n\t\t3)\tNumero");
+			printf("\n\t\t3)\tNumero\t");
 			int opc;
 			scanf_s(" %i",&opc);
 
