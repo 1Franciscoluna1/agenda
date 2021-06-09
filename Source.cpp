@@ -84,7 +84,7 @@ char mostrarmenu() {
 	printf("\n\t\tElija una opcion");
 	printf("\n\n\t\ta)\tAgregar contacto");
 	printf("\n\t\tb)\tModificar contacto");
-	printf("\n\t\tc)\tEliminar contacto");//----------
+	printf("\n\t\tc)\tEliminar contacto");
 	printf("\n\t\td)\tBloquear contacto");
 	printf("\n\t\te)\tBuscar contacto");//------------
 	printf("\n\t\tf)\tMostrar contactos");
