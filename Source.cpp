@@ -80,16 +80,15 @@ int main() {
 
 char mostrarmenu() {
 	char a;
-	printf("\n\n\t\t\t Agenda bien mamalona");
-	printf("\n\t\tElija una opcion");
-	printf("\n\n\t\ta)\tAgregar contacto");
-	printf("\n\t\tb)\tModificar contacto");
-	printf("\n\t\tc)\tEliminar contacto");
-	printf("\n\t\td)\tBloquear contacto");
-	printf("\n\t\te)\tBuscar contacto");//------------
-	printf("\n\t\tf)\tMostrar contactos");
-	printf("\n\t\tg)\tQuitar bloqueo a contacto");
-	printf("\n\t\th)\tSalir\n\n");
+	FILE* MENU = fopen("MENUgood.txt","r");
+	int z;
+	while ((z = fgetc(MENU)) != EOF) { putchar(z); }
+	
+	HANDLE hconsole;
+	hconsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD coord = {73,14};
+	SetConsoleCursorPosition(hconsole, coord);
+
 	scanf_s(" %c", &a, sizeof(a));
 	system("cls");
 	return a;
